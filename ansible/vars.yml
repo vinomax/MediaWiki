@@ -1,0 +1,10 @@
+me_url: https://releases.wikimedia.org/mediawiki/1.40/mediawiki-1.40.0.tar.gz
+temp_dest: /tmp
+me_path: /var/lib/mediawiki
+mysql_root_user: root
+mysql_root_pass: rootpass123
+mediawiki_db_name: mediawiki
+mediawiki_db_user: mediauser
+mediawiki_db_password: mediapass123
+local_host: localhost
+

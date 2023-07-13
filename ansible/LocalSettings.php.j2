@@ -1,0 +1,22 @@
+<?php
+# Protect against web entry
+if ( !defined( 'MEDIAWIKI' ) ) {
+    exit;
+}
+
+# Database settings
+$wgDBtype = 'mysql';
+$wgDBserver = '{{ local_host }}';
+$wgDBname = '{{ mediawiki_db_name }}';
+$wgDBuser = '{{ mediawiki_db_user }}';
+$wgDBpassword = '{{ mediawiki_db_password }}';
+
+# MySQL specific settings
+$wgDBprefix = '';
+$wgDBport = 3306;
+$wgDBTableOptions = "ENGINE=InnoDB, DEFAULT CHARSET=utf8";
+$wgShowExceptionDetails = true;
+$wgParserConf['preprocessorClass'] = 'Preprocessor_Hash';
+$wgReadOnly = false;
+
+$wgServer = false;

@@ -1,0 +1,147 @@
+- hosts: 127.0.0.1
+  become: yes
+  gather_facts: no
+  vars_files:
+    - /tmp/vars.yml
+  tasks:      
+  - name: List PHP module
+    shell: dnf module list php
+  - name: Reset PHP module reset
+    shell: dnf module reset php -y
+  - name: Reset PHP module enable
+    shell: dnf module enable php:7.4 -y
+  - name: Install PHP module
+    shell: dnf install php -y
+  - name: Install latest version of below packages.
+    dnf:
+      name: "{{ item }}"
+      state: latest
+    loop:
+      - httpd
+      - php
+      - php-mysqlnd
+      - php-gd
+      - php-xml
+      - php-fpm
+      - mariadb-server
+      - mariadb
+      - php-mbstring
+      - php-json
+      - mod_ssl
+      - php-intl
+      - php-apcu
+  - name: Start MariaDB service
+    systemd:
+      name: mariadb
+      state: started
+  - name: Install PyMySQL module
+    pip:
+      name: pymysql    
+  - name: Create .my.cnf file
+    copy:
+      dest: /root/.my.cnf
+      content: |
+        [client]
+        user = {{ mysql_root_user }}
+        password = {{ mysql_root_pass }}
+      mode: '0600'
+      owner: root
+      group: root
+  - name: Install Expect package
+    yum:
+      name: expect
+      state: present
+  - name: Create MediaWiki User using Expect
+    shell: |
+      /usr/bin/expect -c '
+      spawn mysql -u {{ mysql_root_user }} -p
+      expect "Enter password:"
+      send "{{ mysql_root_pass }}\r"
+      expect "MariaDB [(none)]>"
+      echo "test"
+      send "CREATE DATABASE {{ mediawiki_db_name }};\r"
+      expect "MariaDB [(none)]>"
+      send "CREATE USER '{{ mediawiki_db_user }}'@'localhost' IDENTIFIED BY '{{ mediawiki_db_password }}';\r"
+      expect "MariaDB [(none)]>"
+      send "GRANT ALL PRIVILEGES ON {{ mediawiki_db_name }}.* TO '{{ mediawiki_db_user }}'@'localhost';\r"
+      expect "MariaDB [(none)]>"
+      send "FLUSH PRIVILEGES;\r"
+      expect "MariaDB [(none)]>"
+      send "exit;\r"
+      interact
+      '
+  - name: Enable MariaDB service
+    systemd:
+      name: mariadb
+      enabled: yes
+  - name: Enable Apache HTTP Server service
+    systemd:
+      name: httpd
+      enabled: yes  
+  - name: Download Media Wiki Tar file
+    get_url:
+      url: "{{ me_url }}"
+      dest: "{{ temp_dest }}"
+  
+  - name: Create mediawiki Directory
+    file:
+      path: "{{ me_path }}"
+      state: directory
+
+  - name: Extract Media Wiki Tar
+    unarchive:
+      src: /tmp/mediawiki-1.40.0.tar.gz
+      dest: "{{ me_path }}"
+      remote_src: yes
+
+  - name: SynLink for MediaWiki
+    file:
+      src: /var/lib/mediawiki/mediawiki-1.40.0
+      dest: /var/www/html/mediawiki
+      state: link
+  - name: Copy LocalSettings.php template
+    template:
+      src: /tmp/LocalSettings.php.j2
+      dest: /var/www/html/mediawiki/LocalSettings.php
+      mode: '0644'
+  - name: Set ownership and permissions
+    file:
+      path: "/var/www/html/mediawiki"
+      owner: apache
+      group: apache
+      recurse: yes
+      state: directory
+      mode: "0755"
+  - name: Start and enable PHP-FPM service
+    service:
+      name: php-fpm
+      state: started
+      enabled: true
+  - name: Enable firewalld service
+    systemd:
+      name: firewalld
+      enabled: yes
+  - name: Create firewall rule for apache service
+    firewalld:
+      service: http
+      zone: public
+      permanent: yes
+      state: enabled
+  - name: Create firewall rule for apache service
+    firewalld:
+      service: https
+      zone: public
+      permanent: yes
+      state: enabled
+  - name: Restart firewalld service to ensure changes take affect.
+    service:
+      name: firewalld
+      state: restarted
+  - name: Restart MariaDB
+    systemd:
+      name: mariadb
+      state: restarted
+  - name: Restart HTTPD
+    systemd:
+      name: httpd
+      state: restarted
