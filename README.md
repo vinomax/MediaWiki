@@ -1,4 +1,4 @@
-# **MEDIAWIKI configuration using Terraform and Ansible.**
+# **MediaWiki configuration using Terraform and Ansible.**
 ------
 ### [MediaWiki Application](https://www.mediawiki.org/wiki/Manual:Running_MediaWiki_on_Red_Hat_Linux).
 
@@ -47,11 +47,12 @@ Execute below terraform commands in project location
 
 ```
 ### **Project Walkthrough :**
-Once the above terrafrom commands are executed, private_key.pem file will be generated with contents which has private key to access linux vm created in Azure portal.\
-Use public ip from terraform output to connect to instance using private_key.pem file.\
-In current project i have used Centos 8 OS, similar settings can be updated in terraform.tfvars file.\
+- Once the above terrafrom commands are executed, private_key.pem file will be generated with contents which has private key to access linux vm created in Azure portal.\
+- Use public ip from terraform output to connect to instance using private_key.pem file.\
+- In current project i have used Centos 8 OS, similar settings can be updated in terraform.tfvars file.\
+- Both MariaDB and Mediawiki is deployed to same VM. In future, it will be deployed in seperate servers.
 
-Note:- The porject execution is success, but i am seeing some issue in latest mediawiki while accessing DB.
+Note:- The porject execution is success, but i am seeing some issue in latest mediawiki while accessing DB. CICD pipeline is not complete for deployments.
 
 ### **Future Project Enhancement**
 
@@ -59,4 +60,7 @@ Note:- The porject execution is success, but i am seeing some issue in latest me
 2. Terraform workspace will be implemented to ease environment access.
 3. Scripts and configurations will be moved to seperate repo.
 4. Currently scripts are copied to host for execution, ansible host will be registered and secrets will be encrypted through ansible vault.
+5. Application will be deployed to containers with helm chart.
+6. Will create CICD pipeline setup to deploy application.
+7. Will seperate MariaDB and mediawiki to support availabilty.
 
