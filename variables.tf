@@ -136,8 +136,3 @@ variable "virtual_machine_Passwd" {
   type        = string
   description = "Password for Azure Virtual Machine. This will be fetched from Key Vault."
 }
-
-variable "vm_public_key" {
-  type        = string
-  description = "Public key for VM"
-}

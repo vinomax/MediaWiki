@@ -76,14 +76,25 @@ resource "null_resource" "config_execution" {
     source  = "ansible/LocalSettings.php.j2"  
     destination  = "/tmp/LocalSettings.php.j2"  # will copy to remote VM
   }
+  provisioner "file" {
+    source  = "ansible/setDB.sh"  
+    destination  = "/tmp/setDB.sh"  # will copy to remote VM
+  }
   provisioner "remote-exec" {       
     inline = [      
+      "chmod +x /tmp/setDB.sh",
+      "chmod +x /tmp/LocalSettings.php",
+      "chmod +x /tmp/playbook.yml",
+      "chmod +x /tmp/vars.yml",
       "sudo dnf upgrade -y",
       "sudo dnf update -y",
       "sudo dnf install -y python3-pip",
       "sudo pip3 install --upgrade pip",
       "sudo pip3 install 'ansible==2.9.17'",
-      "echo 'Ansible installed!!'",
+      "echo 'Ansible installed!!'" ]
+  }  
+  provisioner "remote-exec" {       
+    inline = [
       "ansible-playbook -i localhost /tmp/playbook.yml" ]
   }  
 }

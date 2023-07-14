@@ -30,10 +30,7 @@
       - mod_ssl
       - php-intl
       - php-apcu
-  - name: Start MariaDB service
-    systemd:
-      name: mariadb
-      state: started
+      - php-soap
   - name: Install PyMySQL module
     pip:
       name: pymysql    
@@ -51,25 +48,9 @@
     yum:
       name: expect
       state: present
-  - name: Create MediaWiki User using Expect
+  - name: Execute shell script
     shell: |
-      /usr/bin/expect -c '
-      spawn mysql -u {{ mysql_root_user }} -p
-      expect "Enter password:"
-      send "{{ mysql_root_pass }}\r"
-      expect "MariaDB [(none)]>"
-      echo "test"
-      send "CREATE DATABASE {{ mediawiki_db_name }};\r"
-      expect "MariaDB [(none)]>"
-      send "CREATE USER '{{ mediawiki_db_user }}'@'localhost' IDENTIFIED BY '{{ mediawiki_db_password }}';\r"
-      expect "MariaDB [(none)]>"
-      send "GRANT ALL PRIVILEGES ON {{ mediawiki_db_name }}.* TO '{{ mediawiki_db_user }}'@'localhost';\r"
-      expect "MariaDB [(none)]>"
-      send "FLUSH PRIVILEGES;\r"
-      expect "MariaDB [(none)]>"
-      send "exit;\r"
-      interact
-      '
+      /tmp/setDB.sh "{{ mediawiki_db_name }}" "{{ mediawiki_db_user }}" "{{ mediawiki_db_password }}" "{{ mysql_root_pass }}"
   - name: Enable MariaDB service
     systemd:
       name: mariadb

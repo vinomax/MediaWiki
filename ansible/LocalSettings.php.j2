@@ -19,4 +19,4 @@ $wgShowExceptionDetails = true;
 $wgParserConf['preprocessorClass'] = 'Preprocessor_Hash';
 $wgReadOnly = false;
 
-$wgServer = false;
+$wgServer = WebRequest::detectServer();

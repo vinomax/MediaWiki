@@ -95,5 +95,6 @@ variable "vm_subnetid" {
 }
 variable "vm_public_key" {
   type        = string
-  description = "Public key to set in virtual machines."
+  description = "Public key to set in virtual machines."  
+  default = ""
 }
