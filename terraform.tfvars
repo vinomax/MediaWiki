@@ -1,4 +1,4 @@
-subscription_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+subscription_id = "3c619550-14a0-4006-a7a3-5f0401873fca"
 ## Pre Defined KV for storing secret
 #kv_dev_Name = "dev-thoughtworks-demo-kv" #### We have to change as per env
 ## VNET - SUBNET
